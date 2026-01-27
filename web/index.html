@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web2APK Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.0.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="background-effects">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="ri-android-fill"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>Web2APK</h1>
+                    <span>Web to Android Converter</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <span class="user-display" id="userDisplay" style="display: none;">
+                    <i class="ri-user-3-fill" style="color: #6366f1;"></i>
+                    <span id="loggedInUser">User</span>
+                </span>
+                <button class="btn-icon" id="refreshBtn" title="Refresh">
+                    <i class="ri-refresh-line"></i>
+                </button>
+                <button class="btn-icon" id="logoutBtn" title="Logout" onclick="logout()" style="color: #ef4444;">
+                    <i class="ri-logout-box-line"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Server Status Card -->
+            <div class="card server-card">
+                <div class="card-header">
+                    <i class="ri-server-line"></i>
+                    <h2>Server Status</h2>
+                    <div class="status-badge" id="serverStatus">
+                        <span class="status-dot"></span>
+                        <span>Loading...</span>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-icon"><i class="ri-user-line"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="totalUsers">-</span>
+                                <span class="stat-label">Total Users</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon"><i class="ri-time-line"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="uptime">-</span>
+                                <span class="stat-label">Uptime</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon"><i class="ri-stack-line"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="queueStatus">-</span>
+                                <span class="stat-label">Queue</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon"><i class="ri-terminal-line"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="activeSessions">-</span>
+                                <span class="stat-label">Sessions</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Specs Card -->
+            <div class="card specs-card">
+                <div class="card-header">
+                    <i class="ri-cpu-line"></i>
+                    <h2>System Specs</h2>
+                </div>
+                <div class="card-content">
+                    <div class="specs-list">
+                        <div class="spec-item">
+                            <div class="spec-icon"><i class="ri-computer-line"></i></div>
+                            <div class="spec-info">
+                                <span class="spec-label">Operating System</span>
+                                <span class="spec-value" id="osInfo">Loading...</span>
+                            </div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-icon"><i class="ri-cpu-line"></i></div>
+                            <div class="spec-info">
+                                <span class="spec-label">CPU</span>
+                                <span class="spec-value" id="cpuInfo">Loading...</span>
+                            </div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-icon"><i class="ri-ram-line"></i></div>
+                            <div class="spec-info">
+                                <span class="spec-label">Memory</span>
+                                <span class="spec-value" id="memInfo">Loading...</span>
+                            </div>
+                        </div>
+                        <div class="spec-item memory-bar-container">
+                            <div class="memory-bar">
+                                <div class="memory-used" id="memoryBar"></div>
+                            </div>
+                            <span class="memory-text" id="memoryText">0% used</span>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-icon"><i class="ri-nodejs-line"></i></div>
+                            <div class="spec-info">
+                                <span class="spec-label">Node.js</span>
+                                <span class="spec-value" id="nodeInfo">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Build Mode Tabs -->
+            <div class="build-tabs">
+                <button class="tab-btn active" data-tab="url">
+                    <i class="ri-link"></i>
+                    <span>Build APK (URL)</span>
+                </button>
+                <button class="tab-btn" data-tab="zip">
+                    <i class="ri-folder-zip-line"></i>
+                    <span>Build Project (ZIP)</span>
+                </button>
+            </div>
+
+            <!-- Build APK Card -->
+            <div class="card build-card" id="urlBuildCard">
+                <div class="card-header">
+                    <i class="ri-smartphone-line"></i>
+                    <h2>Build APK</h2>
+                </div>
+                <div class="card-content">
+                    <form id="buildForm">
+                        <div class="form-group">
+                            <label for="urlInput">
+                                <i class="ri-link"></i> Website URL
+                            </label>
+                            <input type="url" id="urlInput" placeholder="https://example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="appNameInput">
+                                <i class="ri-edit-line"></i> App Name
+                            </label>
+                            <input type="text" id="appNameInput" placeholder="My App" maxlength="30" required>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <i class="ri-image-line"></i> App Icon <span class="optional-text">(Optional)</span>
+                            </label>
+                            <div class="icon-upload-zone" id="iconUploadZone">
+                                <input type="file" id="iconInput" accept="image/png,image/jpeg,image/jpg" hidden>
+                                <div class="upload-placeholder" id="uploadPlaceholder">
+                                    <i class="ri-upload-cloud-line"></i>
+                                    <span>Click or drag image here</span>
+                                    <small>PNG/JPG, recommended 512x512px</small>
+                                </div>
+                                <div class="upload-preview hidden" id="uploadPreview">
+                                    <img src="" alt="Icon Preview" id="iconPreviewImg">
+                                    <button type="button" class="remove-icon" id="removeIconBtn">
+                                        <i class="ri-close-line"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Theme Color removed -->
+                        <button type="submit" class="btn-primary" id="buildBtn">
+                            <i class="ri-hammer-line"></i>
+                            <span>Build APK</span>
+                        </button>
+                    </form>
+
+                    <!-- Build Progress -->
+                    <div class="build-progress hidden" id="buildProgress">
+                        <div class="progress-header">
+                            <div class="spinner"></div>
+                            <span id="progressText">Building...</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                    </div>
+
+                    <!-- Build Result -->
+                    <div class="build-result hidden" id="buildResult">
+                        <div class="result-success">
+                            <i class="ri-checkbox-circle-fill"></i>
+                            <h3>Build Success!</h3>
+                            <p>Your APK is ready for download. Click the button below to download your app.</p>
+                            <a href="#" class="btn-download" id="downloadBtn" target="_blank" rel="noopener">
+                                <i class="ri-download-cloud-2-line"></i>
+                                Download APK
+                            </a>
+                            <p class="expire-notice">
+                                <i class="ri-timer-flash-line"></i>
+                                <strong>Link expires in <span id="expireTime">60</span> seconds</strong> - Download now!
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Build Error -->
+                    <div class="build-error hidden" id="buildError">
+                        <div class="error-content">
+                            <i class="ri-error-warning-fill"></i>
+                            <h3>Build Failed</h3>
+                            <p id="errorMessage">An error occurred</p>
+                            <button class="btn-retry" id="retryBtn">
+                                <i class="ri-restart-line"></i>
+                                Try Again
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ZIP Build Card -->
+            <div class="card zip-build-card hidden" id="zipBuildCard">
+                <div class="card-header">
+                    <i class="ri-folder-zip-line"></i>
+                    <h2>Build Project (ZIP)</h2>
+                </div>
+                <div class="card-content">
+                    <form id="zipBuildForm">
+                        <div class="form-group">
+                            <label>
+                                <i class="ri-code-box-line"></i> Project Type
+                            </label>
+                            <div class="project-type-picker">
+                                <button type="button" class="type-btn active" data-type="flutter">
+                                    <i class="ri-flutter-fill"></i>
+                                    <span>Flutter</span>
+                                </button>
+                                <button type="button" class="type-btn" data-type="android">
+                                    <i class="ri-android-fill"></i>
+                                    <span>Android Studio</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <i class="ri-bug-line"></i> Build Type
+                            </label>
+                            <div class="build-type-picker">
+                                <button type="button" class="build-type-btn" data-build="debug">
+                                    <i class="ri-bug-line"></i>
+                                    <span>Debug (Fast)</span>
+                                </button>
+                                <button type="button" class="build-type-btn active" data-build="release">
+                                    <i class="ri-rocket-line"></i>
+                                    <span>Release</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <i class="ri-file-zip-line"></i> Project ZIP File
+                            </label>
+                            <div class="zip-upload-zone" id="zipUploadZone">
+                                <input type="file" id="zipInput" accept=".zip" hidden>
+                                <div class="upload-placeholder" id="zipPlaceholder">
+                                    <i class="ri-upload-cloud-line"></i>
+                                    <span>Click or drag ZIP file here</span>
+                                    <small>Max 50MB. Include full project folder.</small>
+                                </div>
+                                <div class="upload-preview hidden" id="zipPreview">
+                                    <i class="ri-file-zip-fill zip-icon"></i>
+                                    <span id="zipFileName">project.zip</span>
+                                    <button type="button" class="remove-icon" id="removeZipBtn">
+                                        <i class="ri-close-line"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary btn-zip" id="zipBuildBtn">
+                            <i class="ri-hammer-line"></i>
+                            <span>Build Project</span>
+                        </button>
+                    </form>
+
+                    <!-- ZIP Build Progress -->
+                    <div class="build-progress hidden" id="zipBuildProgress">
+                        <div class="progress-header">
+                            <div class="spinner"></div>
+                            <span id="zipProgressText">Building...</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="zipProgressFill"></div>
+                        </div>
+                    </div>
+
+                    <!-- ZIP Build Result -->
+                    <div class="build-result hidden" id="zipBuildResult">
+                        <div class="result-success">
+                            <i class="ri-checkbox-circle-fill"></i>
+                            <h3>Build Success!</h3>
+                            <p>Your APK is ready for download. Click the button below to download your app.</p>
+                            <a href="#" class="btn-download" id="zipDownloadBtn" target="_blank" rel="noopener">
+                                <i class="ri-download-cloud-2-line"></i>
+                                Download APK
+                            </a>
+                            <p class="expire-notice">
+                                <i class="ri-timer-flash-line"></i>
+                                <strong>Link expires in <span id="zipExpireTime">60</span> seconds</strong> - Download
+                                now!
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- ZIP Build Error -->
+                    <div class="build-error hidden" id="zipBuildError">
+                        <div class="error-content">
+                            <i class="ri-error-warning-fill"></i>
+                            <h3>Build Failed</h3>
+                            <p id="zipErrorMessage">An error occurred</p>
+                            <button class="btn-retry" id="zipRetryBtn">
+                                <i class="ri-restart-line"></i>
+                                Try Again
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Build Logs Card -->
+            <div class="card logs-card">
+                <div class="card-header logs-header" id="logsToggle">
+                    <i class="ri-file-list-3-line"></i>
+                    <h2>Build Logs</h2>
+                    <button class="btn-icon logs-clear" id="logsClearBtn" title="Clear Logs">
+                        <i class="ri-delete-bin-line"></i>
+                    </button>
+                    <button class="btn-icon logs-refresh" id="logsRefreshBtn" title="Refresh Logs">
+                        <i class="ri-refresh-line"></i>
+                    </button>
+                    <i class="ri-arrow-down-s-line toggle-icon" id="logsToggleIcon"></i>
+                </div>
+                <div class="card-content logs-content" id="logsContent">
+                    <div class="logs-container" id="logsContainer">
+                        <div class="log-empty">
+                            <i class="ri-inbox-line"></i>
+                            <span>No build logs yet</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                <i class="ri-code-s-slash-line"></i>
+                Powered by Web2APK Bot
+                <span class="separator">•</span>
+                <a href="https://t.me/Otapengenkawin2" target="_blank">
+                    <i class="ri-telegram-fill"></i> @Otapengenkawin2
+                </a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="js/app.js?v=3"></script>
+</body>
+
+</html>
